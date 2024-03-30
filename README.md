@@ -3,6 +3,10 @@
 
 ## 게임 컨셉
 - 자동공격을 하는 캐릭터가 계속해서 앞으로 달려나가고, 선택지를 골라 캐릭터를 성장시키고 몬스터를 물리치며 최종보스까지 도달하는 게임
+
+![arrow_a_row](https://github.com/dhtpgus/AndroidGame-TermProject/assets/112833359/10ebf045-69e2-4f6b-a40f-917f343e5202)
+##### (출처 : https://store.steampowered.com/app/2495980/_Arrow_a_Row/?l=koreana )
+
 ## 게임 메카닉
 - 플레이어는 좌, 우 키를 이용해 왼쪽, 오른쪽으로 움직일 수 있다.
 - 플레이어는 유저가 컨트롤하지 못하는 자동공격(원거리 공격)을 한다.
@@ -43,5 +47,33 @@
 - 영구적으로 저장되는 정보라 초기화되지 않고, 게임에 저장
 - 기본 데미지, 플레이어 체력, 이동속도, 종료시 보상 증가 등의 요소
 ## 예상 게임 실행 흐름
+- 게임 시작 및 메뉴
+
+![image](https://github.com/dhtpgus/AndroidGame-TermProject/assets/112833359/dc6ec4a6-43ea-4ef6-a8ea-42fe78dfa86e)
+
+- 게임 진행
+
+![image](https://github.com/dhtpgus/AndroidGame-TermProject/assets/112833359/f9f613c1-3521-45e3-a521-b93fc31fc922)
+
+- 선택지 및 적(장애물)
+
+![image](https://github.com/dhtpgus/AndroidGame-TermProject/assets/112833359/18d85042-6bf9-4bb6-82f1-cc0908a4d467)
+
+- 게임 종료 및 보상
+
+![image](https://github.com/dhtpgus/AndroidGame-TermProject/assets/112833359/4d1cd91d-5d25-46be-b698-5ed5f9499dc8)
+
+- 플레이어 영구 강화 시스템
+
+![image](https://github.com/dhtpgus/AndroidGame-TermProject/assets/112833359/d5efbb16-bc30-4a85-a371-ae3b751abff8)
 
 ## 개발 일정
+- 1주 차 (4/4 ~ 4/7) : 리소스 수집 및 UI 배치
+- 2주 차 (4/8 ~ 4/14) : 플레이어 이동 처리, 맵 구현
+- 3주 차 (4/15 ~ 4/21) : 일정한 주기로 적, 선택지를 맵에 생성
+- 4주 차 (4/22 ~ 4/28) : 플레이어/적, 선택지 간 충돌 처리
+- 5주 차 (4/29 ~ 5/5) : 선택된 공격 강화 내용 반영
+- 6주 차 (5/6 ~ 5/12) : 게임종료 시 보상처리, 플레이어 영구 강화 시스템
+- 7주 차 (5/13 ~ 5/19) : 보스 구현
+- 8주 차 (5/20 ~ 5/26) : 게임 데이터 저장, 미흡한 부분 추가 구현
+- 9주 차 (5/27 ~ 6/2) : 밸런스 조절 및 최종 검수
