@@ -1,4 +1,4 @@
-# AndroidGame-TermProject
+# Run, Hero!
 24년도 1학기 스마트폰 게임 프로그래밍 텀프로젝트
 
 ## 게임 컨셉
