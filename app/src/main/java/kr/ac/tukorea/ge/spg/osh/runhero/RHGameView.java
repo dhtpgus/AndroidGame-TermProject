@@ -1,189 +1,109 @@
 package kr.ac.tukorea.ge.spg.osh.runhero;
 
+import android.app.Activity;
 import android.content.Context;
-import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.drawable.Drawable;
-import android.text.TextPaint;
-import android.util.AttributeSet;
+import android.graphics.PointF;
+import android.graphics.RectF;
+import android.view.Choreographer;
 import android.view.View;
 
-/**
- * TODO: document your custom view class.
- */
-public class RHGameView extends View {
-    private String mExampleString; // TODO: use a default from R.string...
-    private int mExampleColor = Color.RED; // TODO: use a default from R.color...
-    private float mExampleDimension = 0; // TODO: use a default from R.dimen...
-    private Drawable mExampleDrawable;
+import androidx.annotation.NonNull;
 
-    private TextPaint mTextPaint;
-    private float mTextWidth;
-    private float mTextHeight;
+import java.util.ArrayList;
+
+public class RHGameView extends View implements Choreographer.FrameCallback {
+    private final Activity activity;
+    private long previousNanos = 0;
+    private float elapsedSeconds;
+    private ArrayList<IRHGameObject> gameObjects = new ArrayList<>();
 
     public RHGameView(Context context) {
         super(context);
-        init(null, 0);
+        this.activity = (Activity)context;
+
+        borderPaint = makeBorderPaint();
+
+        setFullScreen();
     }
 
-    public RHGameView(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        init(attrs, 0);
+    @NonNull
+    private Paint makeBorderPaint() {
+        final Paint borderPaint;
+        borderPaint = new Paint();
+        borderPaint.setStyle(Paint.Style.STROKE);
+        borderPaint.setStrokeWidth(0.1f);
+        borderPaint.setColor(Color.RED);
+        return borderPaint;
     }
 
-    public RHGameView(Context context, AttributeSet attrs, int defStyle) {
-        super(context, attrs, defStyle);
-        init(attrs, defStyle);
+    public void setFullScreen() {
+        int flags = View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY |
+                View.SYSTEM_UI_FLAG_FULLSCREEN |
+                View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
+        setSystemUiVisibility(flags);
     }
 
-    private void init(AttributeSet attrs, int defStyle) {
-        // Load attributes
-        final TypedArray a = getContext().obtainStyledAttributes(
-                attrs, R.styleable.RHGameView, defStyle, 0);
+    private static final float SCREEN_WIDTH = 9.0f;
+    private static final float SCREEN_HEIGHT = 16.0f;
+    private final PointF transformOffset = new PointF();
+    private float transformScale = 1;
+    private final RectF borderRect = new RectF(0,0,SCREEN_WIDTH,SCREEN_HEIGHT);
+    private final Paint borderPaint;
 
-        mExampleString = a.getString(
-                R.styleable.RHGameView_exampleString);
-        mExampleColor = a.getColor(
-                R.styleable.RHGameView_exampleColor,
-                mExampleColor);
-        // Use getDimensionPixelSize or getDimensionPixelOffset when dealing with
-        // values that should fall on pixel boundaries.
-        mExampleDimension = a.getDimension(
-                R.styleable.RHGameView_exampleDimension,
-                mExampleDimension);
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
 
-        if (a.hasValue(R.styleable.RHGameView_exampleDrawable)) {
-            mExampleDrawable = a.getDrawable(
-                    R.styleable.RHGameView_exampleDrawable);
-            mExampleDrawable.setCallback(this);
+        float view_ratio = (float)w / (float)h;
+        float game_ratio = SCREEN_WIDTH / SCREEN_HEIGHT;
+
+        if(view_ratio > game_ratio) {
+            transformOffset.set((w-h*game_ratio)/2, 0);
+            transformScale = h / SCREEN_HEIGHT;
+        } else {
+            transformOffset.set(0, (h-w/game_ratio)/2);
+            transformScale = w / SCREEN_WIDTH;
         }
-
-        a.recycle();
-
-        // Set up a default TextPaint object
-        mTextPaint = new TextPaint();
-        mTextPaint.setFlags(Paint.ANTI_ALIAS_FLAG);
-        mTextPaint.setTextAlign(Paint.Align.LEFT);
-
-        // Update TextPaint and text measurements from attributes
-        invalidateTextPaintAndMeasurements();
-    }
-
-    private void invalidateTextPaintAndMeasurements() {
-        mTextPaint.setTextSize(mExampleDimension);
-        mTextPaint.setColor(mExampleColor);
-        mTextWidth = mTextPaint.measureText(mExampleString);
-
-        Paint.FontMetrics fontMetrics = mTextPaint.getFontMetrics();
-        mTextHeight = fontMetrics.bottom;
     }
 
     @Override
-    protected void onDraw(Canvas canvas) {
+    protected void onDraw(@NonNull Canvas canvas) {
         super.onDraw(canvas);
 
-        // TODO: consider storing these as member variables to reduce
-        // allocations per draw cycle.
-        int paddingLeft = getPaddingLeft();
-        int paddingTop = getPaddingTop();
-        int paddingRight = getPaddingRight();
-        int paddingBottom = getPaddingBottom();
-
-        int contentWidth = getWidth() - paddingLeft - paddingRight;
-        int contentHeight = getHeight() - paddingTop - paddingBottom;
-
-        // Draw the text.
-        canvas.drawText(mExampleString,
-                paddingLeft + (contentWidth - mTextWidth) / 2,
-                paddingTop + (contentHeight + mTextHeight) / 2,
-                mTextPaint);
-
-        // Draw the example drawable on top of the text.
-        if (mExampleDrawable != null) {
-            mExampleDrawable.setBounds(paddingLeft, paddingTop,
-                    paddingLeft + contentWidth, paddingTop + contentHeight);
-            mExampleDrawable.draw(canvas);
+        canvas.save();
+        canvas.translate(transformOffset.x, transformOffset.y);
+        canvas.scale(transformScale, transformScale);
+        canvas.drawRect(borderRect, borderPaint);
+        for(IRHGameObject rhGameObject : gameObjects) {
+            rhGameObject.draw(canvas);
         }
+        canvas.restore();
     }
 
-    /**
-     * Gets the example string attribute value.
-     *
-     * @return The example string attribute value.
-     */
-    public String getExampleString() {
-        return mExampleString;
+    @Override
+    public void doFrame(long frameTimeNanos) {
+        long elapsedNanos = frameTimeNanos - previousNanos;
+        elapsedSeconds = elapsedNanos / 1_000_000_000f;
+        if(previousNanos != 0){
+            update();
+        }
+        invalidate();
+        if(isShown()) {
+            scheduleUpdate();
+        }
+        previousNanos = frameTimeNanos;
     }
 
-    /**
-     * Sets the view"s example string attribute value. In the example view, this string
-     * is the text to draw.
-     *
-     * @param exampleString The example string attribute value to use.
-     */
-    public void setExampleString(String exampleString) {
-        mExampleString = exampleString;
-        invalidateTextPaintAndMeasurements();
+    private void scheduleUpdate() {
+        Choreographer.getInstance().postFrameCallback(this);
     }
 
-    /**
-     * Gets the example color attribute value.
-     *
-     * @return The example color attribute value.
-     */
-    public int getExampleColor() {
-        return mExampleColor;
-    }
-
-    /**
-     * Sets the view"s example color attribute value. In the example view, this color
-     * is the font color.
-     *
-     * @param exampleColor The example color attribute value to use.
-     */
-    public void setExampleColor(int exampleColor) {
-        mExampleColor = exampleColor;
-        invalidateTextPaintAndMeasurements();
-    }
-
-    /**
-     * Gets the example dimension attribute value.
-     *
-     * @return The example dimension attribute value.
-     */
-    public float getExampleDimension() {
-        return mExampleDimension;
-    }
-
-    /**
-     * Sets the view"s example dimension attribute value. In the example view, this dimension
-     * is the font size.
-     *
-     * @param exampleDimension The example dimension attribute value to use.
-     */
-    public void setExampleDimension(float exampleDimension) {
-        mExampleDimension = exampleDimension;
-        invalidateTextPaintAndMeasurements();
-    }
-
-    /**
-     * Gets the example drawable attribute value.
-     *
-     * @return The example drawable attribute value.
-     */
-    public Drawable getExampleDrawable() {
-        return mExampleDrawable;
-    }
-
-    /**
-     * Sets the view"s example drawable attribute value. In the example view, this drawable is
-     * drawn above the text.
-     *
-     * @param exampleDrawable The example drawable attribute value to use.
-     */
-    public void setExampleDrawable(Drawable exampleDrawable) {
-        mExampleDrawable = exampleDrawable;
+    private void update() {
+        for(IRHGameObject rhGameObject : gameObjects) {
+            rhGameObject.update(elapsedSeconds);
+        }
     }
 }
