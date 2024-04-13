@@ -2,6 +2,9 @@ package kr.ac.tukorea.ge.spg.osh.runhero;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -16,6 +19,7 @@ import java.util.ArrayList;
 
 public class RHGameView extends View implements Choreographer.FrameCallback {
     private final Activity activity;
+    private final Hero player;
     private long previousNanos = 0;
     private float elapsedSeconds;
     private ArrayList<IRHGameObject> gameObjects = new ArrayList<>();
@@ -25,6 +29,11 @@ public class RHGameView extends View implements Choreographer.FrameCallback {
         this.activity = (Activity)context;
 
         borderPaint = makeBorderPaint();
+        
+        Resources res = getResources();
+        Bitmap heroBitmap = BitmapFactory.decodeResource(res, R.mipmap.hero_walk);
+        this.player = new Hero(heroBitmap);
+        gameObjects.add(player);
 
         setFullScreen();
     }
