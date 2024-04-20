@@ -11,6 +11,7 @@ import android.graphics.Paint;
 import android.graphics.PointF;
 import android.graphics.RectF;
 import android.view.Choreographer;
+import android.view.MotionEvent;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -18,78 +19,41 @@ import androidx.annotation.NonNull;
 import java.util.ArrayList;
 
 public class RHGameView extends View implements Choreographer.FrameCallback {
-    private final Activity activity;
-    private final Hero player;
-    private long previousNanos = 0;
-    private float elapsedSeconds;
-    private ArrayList<IRHGameObject> gameObjects = new ArrayList<>();
-
-    public RHGameView(Context context) {
-        super(context);
-        this.activity = (Activity)context;
-
-        borderPaint = makeBorderPaint();
-        
-        Resources res = getResources();
-        Bitmap heroBitmap = BitmapFactory.decodeResource(res, R.mipmap.hero_walk);
-        this.player = new Hero(heroBitmap);
-        gameObjects.add(player);
-
-        setFullScreen();
-    }
-
-    @NonNull
-    private Paint makeBorderPaint() {
-        final Paint borderPaint;
+    private Paint borderPaint;
+    private Paint fpsPaint;
+    private void initDebugObjects() {
         borderPaint = new Paint();
         borderPaint.setStyle(Paint.Style.STROKE);
         borderPaint.setStrokeWidth(0.1f);
         borderPaint.setColor(Color.RED);
-        return borderPaint;
+
+        fpsPaint = new Paint();
+        fpsPaint.setColor(Color.BLUE);
+        fpsPaint.setTextSize(100f);
     }
+    public RHGameView(Context context) {
+        super(context);
 
-    public void setFullScreen() {
-        int flags = View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY |
-                View.SYSTEM_UI_FLAG_FULLSCREEN |
-                View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
-        setSystemUiVisibility(flags);
-    }
+        setFullScreen();
 
-    private static final float SCREEN_WIDTH = 9.0f;
-    private static final float SCREEN_HEIGHT = 16.0f;
-    private final PointF transformOffset = new PointF();
-    private float transformScale = 1;
-    private final RectF borderRect = new RectF(0,0,SCREEN_WIDTH,SCREEN_HEIGHT);
-    private final Paint borderPaint;
-
-    @Override
-    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-        super.onSizeChanged(w, h, oldw, oldh);
-
-        float view_ratio = (float)w / (float)h;
-        float game_ratio = SCREEN_WIDTH / SCREEN_HEIGHT;
-
-        if(view_ratio > game_ratio) {
-            transformOffset.set((w-h*game_ratio)/2, 0);
-            transformScale = h / SCREEN_HEIGHT;
-        } else {
-            transformOffset.set(0, (h-w/game_ratio)/2);
-            transformScale = w / SCREEN_WIDTH;
+        if(BuildConfig.DEBUG) {
+            initDebugObjects();
         }
+
+        initGame();
+        scheduleUpdate();
     }
 
-    @Override
-    protected void onDraw(@NonNull Canvas canvas) {
-        super.onDraw(canvas);
+    public static Resources res;
+    private ArrayList<IRHGameObject> gameObjects = new ArrayList<>();
+    private void initGame() {
+        res = getResources();
+    }
 
-        canvas.save();
-        canvas.translate(transformOffset.x, transformOffset.y);
-        canvas.scale(transformScale, transformScale);
-        canvas.drawRect(borderRect, borderPaint);
-        for(IRHGameObject rhGameObject : gameObjects) {
-            rhGameObject.draw(canvas);
-        }
-        canvas.restore();
+    private long previousNanos = 0;
+    private float elapsedSeconds;
+    private void scheduleUpdate() {
+        Choreographer.getInstance().postFrameCallback(this);
     }
 
     @Override
@@ -106,13 +70,76 @@ public class RHGameView extends View implements Choreographer.FrameCallback {
         previousNanos = frameTimeNanos;
     }
 
-    private void scheduleUpdate() {
-        Choreographer.getInstance().postFrameCallback(this);
-    }
-
     private void update() {
         for(IRHGameObject rhGameObject : gameObjects) {
             rhGameObject.update(elapsedSeconds);
         }
     }
+
+    @Override
+    protected void onDraw(@NonNull Canvas canvas) {
+        super.onDraw(canvas);
+
+        Scene scene = Scene.top();
+        if(scene == null) {
+            return;
+        }
+        canvas.save();
+        Metrics.concat(canvas);
+        if(BuildConfig.DEBUG) {
+            canvas.drawRect(Metrics.borderRect, borderPaint);
+        }
+        scene.draw(canvas);
+        canvas.restore();
+
+        if(BuildConfig.DEBUG) {
+            int fps = (int) (1.0f / elapsedSeconds);
+            canvas.drawText("FPS: " + fps, 100f, 200f, fpsPaint);
+        }
+    }
+
+
+    public void setFullScreen() {
+        int flags = View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY |
+                View.SYSTEM_UI_FLAG_FULLSCREEN |
+                View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
+        setSystemUiVisibility(flags);
+    }
+
+
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+
+        Metrics.onSize(w, h);
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        Scene scene = Scene.top();
+        if(scene != null) {
+            boolean handled = scene.onTouch(event);
+            if(handled) return true;
+        }
+        return super.onTouchEvent(event);
+    }
+
+    public void onBackPressed() {
+        Scene scene = Scene.top();
+        if(scene == null) {
+            Scene.finishActivity();
+            return;
+        }
+        boolean handled = scene.onBackPressed();
+        if(handled) return;
+
+        Scene.pop();
+    }
+
+
+
+
+
+
+
 }

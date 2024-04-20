@@ -1,30 +1,32 @@
 package kr.ac.tukorea.ge.spg.osh.runhero;
 
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.RectF;
 
-public class Hero implements IRHGameObject{
+public class Hero extends Sprite{
     private static final float RADIUS = 1.25f;
-    private Bitmap bitmap;
-    private float x, y;
-    private RectF dstRect = new RectF();
-    public Hero(Bitmap bitmap) {
-        x = 5.0f;
-        y = 12.0f;
-        dstRect.set(x-RADIUS, y, x+RADIUS, y+2*RADIUS);
-        this.bitmap = bitmap;
+    private static final float SPEED = 8.0f;
+    private static final String TAG = Hero.class.getSimpleName();
+
+    public Hero() {
+        super(R.mipmap.hero_walk);
+        //super(R.mipmap.plane_240);
+        x = Metrics.width / 2;
+        y = 2 * Metrics.height / 3;
+        setPosition(x, y, RADIUS);
+
     }
 
     @Override
     public void update(float elapsedSeconds) {
-        dstRect.set(x-RADIUS, y-RADIUS, x+RADIUS, y+RADIUS);
+        super.update(elapsedSeconds);
+
     }
 
     @Override
     public void draw(Canvas canvas) {
         canvas.save();
-        canvas.drawBitmap(bitmap, null, dstRect, null);
+        //canvas.rotate(angle + 90, x, y);
+        super.draw(canvas);
         canvas.restore();
     }
 }
