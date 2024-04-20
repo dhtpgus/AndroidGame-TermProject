@@ -71,8 +71,9 @@ public class RHGameView extends View implements Choreographer.FrameCallback {
     }
 
     private void update() {
-        for(IRHGameObject rhGameObject : gameObjects) {
-            rhGameObject.update(elapsedSeconds);
+        Scene scene = Scene.top();
+        if (scene != null) {
+            scene.update(elapsedSeconds);
         }
     }
 
