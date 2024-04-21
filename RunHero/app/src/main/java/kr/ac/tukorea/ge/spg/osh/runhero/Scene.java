@@ -4,6 +4,7 @@ import android.graphics.Canvas;
 import android.util.Log;
 import android.view.MotionEvent;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class Scene {
@@ -53,19 +54,30 @@ public class Scene {
         RHGameActivity.activity.finish();
     }
 
-    protected final ArrayList<IRHGameObject> gameObjects = new ArrayList<>();
+    protected ArrayList<ArrayList<IRHGameObject>> layers = new ArrayList<>();
+
+    protected void initLayers(int layerCount) {
+        layers = new ArrayList<>();
+        for (int i = 0; i < layerCount; i++) {
+            layers.add(new ArrayList<>());
+        }
+    }
 
     public void update(float elapsedSeconds) {
-        int count = gameObjects.size();
-        for (int i = count - 1; i >= 0; i--) {
-            IRHGameObject gameObject = gameObjects.get(i);
-            gameObject.update(elapsedSeconds);
+        for (ArrayList<IRHGameObject> objects : layers) {
+            int count = objects.size();
+            for (int i = count - 1; i >= 0; i--) {
+                IRHGameObject gameObject = objects.get(i);
+                gameObject.update(elapsedSeconds);
+            }
         }
     }
 
     public void draw(Canvas canvas) {
-        for (IRHGameObject gameObject : gameObjects) {
-            gameObject.draw(canvas);
+        for (ArrayList<IRHGameObject> objects : layers) {
+            for(IRHGameObject gameObject : objects) {
+                gameObject.draw(canvas);
+            }
         }
     }
 
@@ -93,8 +105,8 @@ public class Scene {
 
     //////////////////////////////////////////////////
     // Game Object Management
-    public void add(IRHGameObject gameObject) {
-        gameObjects.add(gameObject);
-        Log.d(TAG, gameObjects.size() + " objects in " + getClass().getSimpleName());
+    public void add(int layerIndex, IRHGameObject gameObject) {
+        ArrayList<IRHGameObject> objects = layers.get(layerIndex);
+        objects.add(gameObject);
     }
 }
