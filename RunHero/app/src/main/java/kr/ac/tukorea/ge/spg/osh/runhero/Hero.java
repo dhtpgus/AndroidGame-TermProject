@@ -3,13 +3,16 @@ package kr.ac.tukorea.ge.spg.osh.runhero;
 import android.graphics.Canvas;
 import android.view.MotionEvent;
 
-public class Hero extends Sprite{
-    private static final float RADIUS = 1.25f;
+public class Hero extends AnimSprite{
+    private static final float RADIUS = 0.9f;
     private static final float SPEED = 4.0f;
     private float targetX;
+    private static final int[] HERO_ANIMS = {R.mipmap.hero_walkforward0, R.mipmap.hero_walkleft,
+            R.mipmap.hero_walkright, R.mipmap.hero_death0};
 
     public Hero() {
-        super(R.mipmap.hero_walkforward0);
+        super(HERO_ANIMS, 4.f);
+        setAnimationResource(R.mipmap.hero_walkforward0, 4.f, 3);
         x = Metrics.width / 2;
         y = Metrics.height - 3;
         setPosition(x, y, RADIUS);
@@ -32,10 +35,13 @@ public class Hero extends Sprite{
     public void update(float elapsedSeconds) {
         if(targetX < x) {
             dx = -SPEED;
+            setAnimationResource(R.mipmap.hero_walkleft, 4.f, 6);
         } else if (x < targetX) {
             dx = SPEED;
+            setAnimationResource(R.mipmap.hero_walkright, 4.f, 6);
         } else {
             dx = 0;
+            setAnimationResource(R.mipmap.hero_walkforward0, 4.f, 3);
         }
         super.update(elapsedSeconds);
         float adjx = x;
@@ -56,7 +62,6 @@ public class Hero extends Sprite{
     @Override
     public void draw(Canvas canvas) {
         canvas.save();
-        //canvas.rotate(angle + 90, x, y);
         super.draw(canvas);
         canvas.restore();
     }

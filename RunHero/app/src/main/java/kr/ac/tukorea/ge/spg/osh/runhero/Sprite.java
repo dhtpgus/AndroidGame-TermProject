@@ -4,16 +4,23 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.RectF;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class Sprite implements IRHGameObject{
+    protected List<Bitmap> bitmaps;
     protected Bitmap bitmap;
     protected final RectF dstRect = new RectF();
     protected float x, y, dx, dy;
     protected float width, height, radius;
 
-    public Sprite(int mipmapId) {
-        if (mipmapId != 0) {
-            bitmap = BitmapPool.get(mipmapId);
+    public Sprite(int[] mipmapIds) {
+        this.bitmaps = new ArrayList<>();
+        for(int mipmapId : mipmapIds) {
+            if (mipmapId != 0) {
+                bitmap = BitmapPool.get(mipmapId);
+            }
         }
     }
 
