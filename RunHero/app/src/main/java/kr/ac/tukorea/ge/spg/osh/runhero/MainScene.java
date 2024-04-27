@@ -1,10 +1,6 @@
 package kr.ac.tukorea.ge.spg.osh.runhero;
 
-import android.graphics.Bitmap;
 import android.view.MotionEvent;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class MainScene extends Scene{
     private static final String TAG = MainScene.class.getSimpleName();
@@ -20,7 +16,8 @@ public class MainScene extends Scene{
 
         add(Layer.player.ordinal(), hero);
 
-        add(Layer.bg.ordinal(), new Background(R.mipmap.test_map, 0.5f));
+        add(Layer.bg.ordinal(), new Background(R.mipmap.background, 0.5f));
+        add(Layer.bg.ordinal(), new Background(R.mipmap.tree_background, 0.7f));
     }
 
     @Override
@@ -28,3 +25,4 @@ public class MainScene extends Scene{
         return hero.onTouch(event);
     }
 }
+
