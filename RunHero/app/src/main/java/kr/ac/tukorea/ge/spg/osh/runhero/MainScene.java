@@ -20,7 +20,7 @@ public class MainScene extends Scene{
 
         add(Layer.player.ordinal(), hero);
 
-        add(Layer.bg.ordinal(), new Background(Background.BACKGROUND_IMAGES , 0.5f));
+        add(Layer.bg.ordinal(), new Background(R.mipmap.test_map, 0.5f));
     }
 
     @Override

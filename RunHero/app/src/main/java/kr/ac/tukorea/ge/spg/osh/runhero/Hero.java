@@ -11,8 +11,7 @@ public class Hero extends AnimSprite{
             R.mipmap.hero_walkright, R.mipmap.hero_death0};
 
     public Hero() {
-        super(HERO_ANIMS, 4.f);
-        setAnimationResource(R.mipmap.hero_walkforward0, 4.f, 3);
+        super(R.mipmap.hero_walkforward0, 4.f);
         x = Metrics.width / 2;
         y = Metrics.height - 3;
         setPosition(x, y, RADIUS);

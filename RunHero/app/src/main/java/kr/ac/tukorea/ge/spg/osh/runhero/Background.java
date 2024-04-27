@@ -7,7 +7,7 @@ public class Background extends Sprite{
     private final float height;
 
     public static final int[] BACKGROUND_IMAGES = {R.mipmap.test_map};
-    public Background(int[] bitmapResId, float speed) {
+    public Background(int bitmapResId, float speed) {
         super(bitmapResId);
         this.height = bitmap.getHeight() * Metrics.width / bitmap.getWidth();
         setPosition(Metrics.width / 2, Metrics.height / 2, Metrics.width, height);

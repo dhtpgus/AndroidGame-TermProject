@@ -10,8 +10,8 @@ public class AnimSprite extends Sprite{
     private int frameCount;
     private final long createdOn;
 
-    public AnimSprite(int[] mipmapIds, float fps) {
-        super(mipmapIds);
+    public AnimSprite(int mipmapId, float fps) {
+        super(mipmapId);
         setAnimationResource(0, fps, 0);
         createdOn = System.currentTimeMillis();
     }
