@@ -7,7 +7,7 @@ public class MainScene extends Scene{
     private final Hero hero;
 
     public enum Layer {
-        bg, monster, player, COUNT
+        bg, monster, player, projectile, controller, COUNT
     }
     public MainScene() {
         Metrics.setGameSize(9.0f, 16.0f);
@@ -15,10 +15,13 @@ public class MainScene extends Scene{
         initLayers(Layer.COUNT.ordinal());
 
         add(Layer.player.ordinal(), hero);
-        add(Layer.monster.ordinal(), new Monster());
+        //add(Layer.monster.ordinal(), new Monster());
 
         add(Layer.bg.ordinal(), new Background(R.mipmap.background, 0.5f));
         add(Layer.bg.ordinal(), new Background(R.mipmap.tree_background, 0.7f));
+
+        add(Layer.controller.ordinal(), new CollisionChecker());
+        add(Layer.controller.ordinal(), new MonsterGenerator());
     }
 
     @Override

@@ -6,6 +6,8 @@ import android.view.MotionEvent;
 public class Hero extends AnimSprite{
     private static final float RADIUS = 0.9f;
     private static final float SPEED = 4.0f;
+    private static final float FIRE_INTERVAL = 0.25f;
+    private float fireCoolTime = FIRE_INTERVAL;
     private float targetX;
     private static final int[] HERO_ANIMS = {R.mipmap.hero_walkforward, R.mipmap.hero_walkleft,
             R.mipmap.hero_walkright};
@@ -52,10 +54,26 @@ public class Hero extends AnimSprite{
         if(adjx != x) {
             setPosition(adjx, y, RADIUS);
         }
+
+        fireProjectile(elapsedSeconds);
     }
 
     private void setTargetX(float x) {
         targetX = Math.max(RADIUS, Math.min(x, Metrics.width - RADIUS));
+    }
+
+    private void fireProjectile(float elapsedSeconds) {
+        MainScene scene = (MainScene)Scene.top();
+        if(scene == null) return;
+        fireCoolTime -= elapsedSeconds;
+        if(fireCoolTime > 0) return;
+
+        fireCoolTime = FIRE_INTERVAL;
+
+        int power = 10;
+        Projectile projectile = Projectile.get(x, y-0.8f, power);
+
+        scene.add(MainScene.Layer.projectile.ordinal(), projectile);
     }
 
     @Override

@@ -1,6 +1,9 @@
 package kr.ac.tukorea.ge.spg.osh.runhero;
 
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.RectF;
 import android.util.Log;
 import android.view.MotionEvent;
 
@@ -63,6 +66,10 @@ public class Scene {
         }
     }
 
+    public ArrayList<IRHGameObject> objectsAt(int layerIndex) {
+        return layers.get(layerIndex);
+    }
+
     public void update(float elapsedSeconds) {
         for (ArrayList<IRHGameObject> objects : layers) {
             int count = objects.size();
@@ -72,11 +79,26 @@ public class Scene {
             }
         }
     }
-
+    protected static Paint bboxPaint;
     public void draw(Canvas canvas) {
         for (ArrayList<IRHGameObject> objects : layers) {
             for(IRHGameObject gameObject : objects) {
                 gameObject.draw(canvas);
+            }
+        }
+        if(BuildConfig.DEBUG) {
+            if (bboxPaint == null) {
+                bboxPaint = new Paint();
+                bboxPaint.setStyle(Paint.Style.STROKE);
+                bboxPaint.setColor(Color.RED);
+            }
+            for (ArrayList<IRHGameObject> objects: layers) {
+                for (IRHGameObject gobj : objects) {
+                    if (gobj instanceof IBoxCollidable) {
+                        RectF rect = ((IBoxCollidable) gobj).getCollisionRect();
+                        canvas.drawRect(rect, bboxPaint);
+                    }
+                }
             }
         }
     }
@@ -108,5 +130,10 @@ public class Scene {
     public void add(int layerIndex, IRHGameObject gameObject) {
         ArrayList<IRHGameObject> objects = layers.get(layerIndex);
         objects.add(gameObject);
+    }
+
+    public void remove(int layerIndex, IRHGameObject gameObject) {
+        ArrayList<IRHGameObject> objects = layers.get(layerIndex);
+        objects.remove(gameObject);
     }
 }
