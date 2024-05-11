@@ -3,7 +3,7 @@ package kr.ac.tukorea.ge.spg.osh.runhero;
 import android.graphics.Canvas;
 
 public class MonsterGenerator implements IRHGameObject{
-    private float MONSTER_GEN_INTERVAL = 5.0f;
+    private float MONSTER_GEN_INTERVAL = 7.0f;
     private float monsterTime = 0;
     @Override
     public void update(float elapsedSeconds) {

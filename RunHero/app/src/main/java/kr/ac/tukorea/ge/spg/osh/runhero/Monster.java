@@ -8,6 +8,7 @@ public class Monster extends AnimSprite implements IBoxCollidable{
     private static final float RADIUS = 1.7f;
     protected RectF collisionRect = new RectF();
     private int life, maxLife;
+    protected static Gauge gauge = new Gauge(0.1f, R.color.enemy_gauge_fg, R.color.enemy_gauge_bg);
 
     Monster() {
         super(R.mipmap.monster, 5.f);
@@ -41,6 +42,11 @@ public class Monster extends AnimSprite implements IBoxCollidable{
         super.draw(canvas);
         canvas.save();
 
+        float width = dstRect.width() * 0.7f;
+        canvas.translate(x - width / 2, dstRect.bottom);
+        canvas.scale(width, width);
+        gauge.draw(canvas, (float)life / maxLife);
+        canvas.restore();
     }
 
     @Override
