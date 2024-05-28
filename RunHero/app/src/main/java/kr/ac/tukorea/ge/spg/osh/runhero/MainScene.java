@@ -5,9 +5,10 @@ import android.view.MotionEvent;
 public class MainScene extends Scene{
     private static final String TAG = MainScene.class.getSimpleName();
     private final Hero hero;
+    public final Generator generator;
 
     public enum Layer {
-        bg, monster, player, projectile, controller, COUNT
+        bg, selector, monster, player, projectile, controller, generator, COUNT
     }
     public MainScene() {
         Metrics.setGameSize(9.0f, 16.0f);
@@ -21,7 +22,12 @@ public class MainScene extends Scene{
         add(Layer.bg.ordinal(), new Background(R.mipmap.tree_background, 0.7f));
 
         add(Layer.controller.ordinal(), new CollisionChecker());
-        add(Layer.controller.ordinal(), new MonsterGenerator());
+
+        generator = new Generator();
+        add(Layer.generator.ordinal(), generator);
+        generator.addGenerator(new SelectorGenerator());
+        generator.addGenerator(new MonsterGenerator());
+
     }
 
     @Override

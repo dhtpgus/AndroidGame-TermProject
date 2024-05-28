@@ -2,12 +2,12 @@ package kr.ac.tukorea.ge.spg.osh.runhero;
 
 import android.graphics.Canvas;
 
-public class MonsterGenerator extends Generator{
+public class SelectorGenerator extends Generator{
 
-    public MonsterGenerator() {
+    public SelectorGenerator() {
         genInterval = 14.f;
-        genTime = 0;
-        genType = GenType.MONSTER;
+        genTime = 7;
+        genType = GenType.SELECTOR;
     }
 
     @Override
@@ -23,10 +23,11 @@ public class MonsterGenerator extends Generator{
         Scene scene = Scene.top();
         if(scene == null) return;
 
-        scene.add(MainScene.Layer.monster.ordinal(), Monster.get());
+        scene.add(MainScene.Layer.selector.ordinal(), Selector.get());
     }
+
     @Override
     public void draw(Canvas canvas) {
-
+        super.draw(canvas);
     }
 }
